@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.content {
+  min-height: calc(100vh - 2rem); /* Adjust according to your sidebar height */
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.dashboard-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.blog-list {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.blog-card {
+  margin-bottom: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005bb5;
+}
+
+.dashboard-container, .blog-list, .blog-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.blog-card {
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+
+
+/* Example blog content styling */
+.blog-post-content h1, .blog-post-content h2, .blog-post-content h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.blog-post-content p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.blog-post-content ul, .blog-post-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.blog-post-content blockquote {
+  background-color: #f9f9f9;
+  border-left: 5px solid #ccc;
+  margin: 1.5rem 0;
+  padding: 1rem;
+}
+
+
+/* styles/globals.css or styles/Testimonials.module.css */
+@keyframes slider {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-slider {
+  display: flex;
+  animation: slider 20s linear infinite;
+}
+
+.animate-slider > div {
+  flex: 0 0 auto; /* Prevent flex items from shrinking */
+}
