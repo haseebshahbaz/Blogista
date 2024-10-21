@@ -1,14 +1,16 @@
 'use client';
 
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useRouter } from 'next/navigation'; // For navigation
 import { db } from '../firbase/firbase.js'; // Ensure correct import path
 import Link from 'next/link';
-
+import Loader from '../components/Loader'; // Import the Loader component
 
 const HomePage = () => {
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true); // State to track loading
   const router = useRouter(); // Use router for navigation
 
   useEffect(() => {
@@ -20,6 +22,7 @@ const HomePage = () => {
         ...doc.data(),
       }));
       setBlogs(blogList);
+      setLoading(false); // Set loading to false after fetching
     };
 
     fetchBlogs();
@@ -34,6 +37,8 @@ const HomePage = () => {
   const handleBlogClick = (id) => {
     router.push(`/blog/${id}`); // Navigate to blog/[id] page
   };
+
+  if (loading) return <Loader />; // Show loader while loading
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -50,7 +55,7 @@ const HomePage = () => {
               />
               <div className="p-6">
                 <h2 className="text-2xl font-semibold mb-2">{blog.title}</h2>
-                <p className="text-gray-700 mb-4">{blog.content.slice(0, 100)}...</p>
+                <p className="text-gray-700 mb-4">{truncateContent(blog.content, 100)}</p>
                 <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
                   Read More
                 </button>

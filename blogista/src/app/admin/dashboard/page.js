@@ -11,8 +11,6 @@ import { ClipLoader } from 'react-spinners';
 import { FaTachometerAlt, FaBlog, FaUsers, FaSignOutAlt } from 'react-icons/fa';
 import '../../globals.css';
 
-
-
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -26,6 +24,13 @@ export default function Dashboard() {
   const [section, setSection] = useState("dashboard");
   const [error, setError] = useState("");
   const [uploadMessage, setUploadMessage] = useState(""); // Message for image upload status
+  const [newUserDetails, setNewUserDetails] = useState({
+    email: "",
+    name: "",
+    fatherName: "",
+    role: "",
+  });
+  const [editingUserId, setEditingUserId] = useState(null); // For editing users
 
   const router = useRouter();
 
@@ -67,13 +72,13 @@ export default function Dashboard() {
     setLoading(true); // Start loading during image upload
     setUploadMessage(""); // Clear previous messages
     try {
-      const imageRef = ref(storage, `blogs/${image.name}`);
+      const imageRef = ref(storage, `users/${image.name}`);
       await uploadBytes(imageRef, image);
       const url = await getDownloadURL(imageRef);
       setImageUrl(url);
       setLoading(false); // Stop loading after upload is complete
       setUploadMessage("Image uploaded successfully!"); // Set upload success message
-      setTimeout(() => setUploadMessage(""), 10000); // Remove message after 3 seconds
+      setTimeout(() => setUploadMessage(""), 10000); // Remove message after 10 seconds
       return true;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -81,6 +86,73 @@ export default function Dashboard() {
       setLoading(false); // Stop loading on error
       return false;
     }
+  };
+
+  const handleAddOrUpdateUser = async (e) => {
+    e.preventDefault();
+    
+    if (!newUserDetails.email || !newUserDetails.name || !newUserDetails.fatherName || !newUserDetails.role || !imageUrl) {
+      setError("Please fill all fields and upload an image.");
+      return;
+    }
+
+    setLoading(true); // Show loading during user addition
+    setError("");
+
+    try {
+      if (editingUserId) {
+        await updateDoc(doc(db, "users", editingUserId), {
+          ...newUserDetails,
+          imageUrl,
+          updatedAt: new Date(),
+        });
+        setEditingUserId(null);
+      } else {
+        await addDoc(collection(db, "users"), {
+          ...newUserDetails,
+          imageUrl,
+          createdAt: new Date(),
+        });
+      }
+
+      // Clear the form fields
+      setNewUserDetails({
+        email: "",
+        name: "",
+        fatherName: "",
+        role: "",
+      });
+      setImage(null);
+      setImageUrl("");
+      fetchBlogsAndUsers();
+    } catch (error) {
+      console.error("Error adding/updating user: ", error);
+      setError("Failed to add/update user.");
+    }
+    setLoading(false);
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUserId(user.id);
+    setNewUserDetails({
+      email: user.email,
+      name: user.name,
+      fatherName: user.fatherName,
+      role: user.role,
+    });
+    setImageUrl(user.imageUrl); // Set the current image URL for editing
+  };
+
+  const handleDeleteUser = async (id) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    setLoading(true);
+    try {
+      await deleteDoc(doc(db, "users", id));
+      fetchBlogsAndUsers();
+    } catch (error) {
+      console.error("Error deleting user: ", error);
+    }
+    setLoading(false);
   };
 
   const handleAddOrUpdateBlog = async (e) => {
@@ -125,35 +197,11 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  const handleEditBlog = (blog) => {
-    setEditingBlogId(blog.id);
-    setTitle(blog.title);
-    setContent(blog.content);
-    setImageUrl(blog.imageUrl);
-  };
-
-  const handleDeleteBlog = async (id) => {
-    if (!confirm("Are you sure you want to delete this blog?")) return;
-    setLoading(true);
-    try {
-      await deleteDoc(doc(db, "blogs", id));
-      fetchBlogsAndUsers();
-    } catch (error) {
-      console.error("Error deleting blog: ", error);
-    }
-    setLoading(false);
-  };
-
   const truncateContent = (content, maxLength) => {
     if (content.length > maxLength) {
       return content.substring(0, maxLength) + "...";
     }
     return content;
-  };
-
-  const handleAddUser = async (e) => {
-    e.preventDefault();
-    // Implement your logic for adding a user
   };
 
   return (
@@ -198,17 +246,11 @@ export default function Dashboard() {
             {section === "dashboard" && (
               <div>
                 <h2 className="text-2xl font-bold mb-5">Welcome, {user?.email}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
-                  <div className="bg-blue-500 p-4 rounded text-white text-center shadow-lg">
-                    <h3>Total Blogs</h3>
-                    <p>{blogs.length}</p>
-                  </div>
-                  <div className="bg-green-500 p-4 rounded text-white text-center shadow-lg">
-                    <h3>Total Users</h3>
-                    <p>{users.length}</p>
-                  </div>
+                <div className="bg-white p-4 rounded shadow-md">
+                  <h3 className="text-xl font-bold mb-3">User Stats</h3>
+                  <p>Total Blogs: {blogs.length}</p>
+                  <p>Total Users: {users.length}</p>
                 </div>
-                <p className="mb-5">Here’s an overview of the site stats and activities.</p>
               </div>
             )}
 
@@ -223,71 +265,54 @@ export default function Dashboard() {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
-                    className="p-2 mb-3 w-full border border-gray-300 rounded"
+                    className="w-full p-2 border rounded mb-2"
                   />
                   <Editor
-                    apiKey="91srh7sao13jguv8yamww9uzrlqr53jfqgj1zdam2twm8tab" // Replace with your TinyMCE API key
-                    value={content}
-                    onEditorChange={(newContent) => setContent(newContent)}
+                    initialValue={content}
                     init={{
                       height: 300,
                       menubar: false,
-                      plugins: [
-                        "advlist autolink lists link image charmap print preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table paste code help wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help",
+                      plugins: ["lists link image code"],
+                      toolbar: "undo redo | styleselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code",
                     }}
+                    onEditorChange={(newContent) => setContent(newContent)}
                   />
-                  <div className="my-3">
-                    <label htmlFor="image" className="block mb-1">Blog Image:</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setImage(e.target.files[0])}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleImageUpload}
-                      disabled={!image} // Disable button if no image is selected
-                      className="mt-3 px-4 py-2 bg-blue-500 text-white rounded"
-                    >
-                      Upload Image
-                    </button>
-                    {uploadMessage && <p className="text-green-500">{uploadMessage}</p>}
-                  </div>
-
-                  {error && <p className="text-red-500">{error}</p>}
-
-                  <button
-                    type="submit"
-                    disabled={!title || !content || !imageUrl} // Button is disabled if fields are incomplete
-                    className="px-4 py-2 bg-green-500 text-white rounded mt-3"
-                  >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    className="mt-2 mb-2"
+                  />
+                  <button type="button" onClick={handleImageUpload} className="bg-blue-500 text-white p-2 rounded">
+                    Upload Image
+                  </button>
+                  <span className="text-green-500">{uploadMessage}</span>
+                  <button type="submit" className="bg-green-500 text-white p-2 rounded mt-3">
                     {editingBlogId ? "Update Blog" : "Add Blog"}
                   </button>
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
                 </form>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {blogs.map((blog) => (
-                    <div key={blog.id} className="bg-white p-4 rounded shadow-md">
-                      <h3 className="text-lg font-bold">{blog.title}</h3>
-                      <img src={blog.imageUrl} alt={blog.title} className="my-3 w-full h-40 object-cover rounded" />
-                      <p>{truncateContent(blog.content, 100)}</p>
-                      <div className="flex justify-between mt-3 gap-2">
-                        <button onClick={() => handleEditBlog(blog)} className="px-3 py-1 bg-yellow-500 text-white rounded">
+                <h3 className="text-xl font-bold mb-3">Existing Blogs</h3>
+                {blogs.length > 0 ? (
+                  <div className="bg-white p-4 rounded shadow-md">
+                    {blogs.map((blog) => (
+                      <div key={blog.id} className="border-b mb-2 pb-2">
+                        <h4 className="font-bold">{blog.title}</h4>
+                        <img src={blog.imageUrl} alt={blog.title} className="w-full h-48 object-cover rounded mb-2" />
+                        <p>{truncateContent(blog.content, 100)}</p>
+                        <button onClick={() => handleEditBlog(blog)} className="text-blue-500">
                           Edit
                         </button>
-                        <button onClick={() => handleDeleteBlog(blog.id)} className="px-3 py-1 bg-red-500 text-white rounded">
+                        <button onClick={() => handleDeleteBlog(blog.id)} className="text-red-500 ml-2">
                           Delete
                         </button>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No blogs available.</p>
+                )}
               </div>
             )}
 
@@ -295,27 +320,74 @@ export default function Dashboard() {
             {section === "manageUsers" && (
               <div>
                 <h2 className="text-2xl font-bold mb-5">Manage Users</h2>
-                {/* Add user form */}
-                <form onSubmit={handleAddUser} className="mb-5 bg-white p-4 rounded shadow-md">
+                <form onSubmit={handleAddOrUpdateUser} className="mb-5 bg-white p-4 rounded shadow-md">
+                  <input
+                    type="email"
+                    placeholder="User Email"
+                    value={newUserDetails.email}
+                    onChange={(e) => setNewUserDetails({ ...newUserDetails, email: e.target.value })}
+                    required
+                    className="w-full p-2 border rounded mb-2"
+                  />
                   <input
                     type="text"
-                    placeholder="User Email"
+                    placeholder="User Name"
+                    value={newUserDetails.name}
+                    onChange={(e) => setNewUserDetails({ ...newUserDetails, name: e.target.value })}
                     required
-                    className="p-2 mb-3 w-full border border-gray-300 rounded"
+                    className="w-full p-2 border rounded mb-2"
                   />
-                  <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-                    Add User
+                  <input
+                    type="text"
+                    placeholder="Father's Name"
+                    value={newUserDetails.fatherName}
+                    onChange={(e) => setNewUserDetails({ ...newUserDetails, fatherName: e.target.value })}
+                    required
+                    className="w-full p-2 border rounded mb-2"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Role"
+                    value={newUserDetails.role}
+                    onChange={(e) => setNewUserDetails({ ...newUserDetails, role: e.target.value })}
+                    required
+                    className="w-full p-2 border rounded mb-2"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                    className="mt-2 mb-2"
+                  />
+                  <button type="button" onClick={handleImageUpload} className="bg-blue-500 text-white p-2 rounded">
+                    Upload Image
                   </button>
+                  <span className="text-green-500">{uploadMessage}</span>
+                  <button type="submit" className="bg-green-500 text-white p-2 rounded mt-3">
+                    {editingUserId ? "Update User" : "Add User"}
+                  </button>
+                  {error && <p className="text-red-500 mt-2">{error}</p>}
                 </form>
 
-                {/* Displaying users */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {users.map((user) => (
-                    <div key={user.id} className="bg-white p-4 rounded shadow-md">
-                      <h3 className="text-lg font-bold">{user.email}</h3>
-                    </div>
-                  ))}
-                </div>
+                <h3 className="text-xl font-bold mb-3">Existing Users</h3>
+                {users.length > 0 ? (
+                  <div className="bg-white p-4 rounded shadow-md">
+                    {users.map((user) => (
+                      <div key={user.id} className="border-b mb-2 pb-2">
+                        <h4 className="font-bold">{user.name} - {user.role}</h4>
+                        <img src={user.imageUrl} alt={user.name} className="w-24 h-24 object-cover rounded mb-2" />
+                        <button onClick={() => handleEditUser(user)} className="text-blue-500">
+                          Edit
+                        </button>
+                        <button onClick={() => handleDeleteUser(user.id)} className="text-red-500 ml-2">
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No users available.</p>
+                )}
               </div>
             )}
           </>

@@ -1,6 +1,6 @@
 export default function CTABanner() {
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-16 text-white text-center relative overflow-hidden">
+    <section className="bg-gradient-to-r from-blue-400 to-indigo-600 py-16 text-white text-center relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         <h2 className="text-5xl font-bold mb-4">
           Unlock Exclusive Insights

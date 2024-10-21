@@ -7,13 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: '#2D3748', // Dark Blue
-        secondary: '#38B2AC', // Teal
-        accent: '#F6AD55', // Amber
-        background: '#F7FAFC', // Light Gray
-        text: '#2D3748', // Dark Gray
-      },
+
     },
   },
   plugins: [],

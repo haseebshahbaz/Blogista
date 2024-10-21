@@ -185,6 +185,8 @@ import { useParams } from 'next/navigation'; // Use `useParams` for App Router i
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firbase/firbase.js'; // Adjust based on your setup
 import { FaSpinner } from 'react-icons/fa'; // Import loading spinner icon
+import Loader from '@/app/components/Loader.js';
+import Navbar from '@/app/components/Navbar.js';
 
 const BlogDetailPage = () => {
   const { id } = useParams(); // Get the dynamic id from the URL
@@ -211,17 +213,16 @@ const BlogDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <FaSpinner className="animate-spin text-blue-500" size={50} />
-      </div>
-    );
-  }
+      <Loader />
+    ) }
 
   if (!blog) {
     return <p className="text-center">Blog not found!</p>;
   }
 
   return (
+    <div>
+      <Navbar />
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-6">{blog.title}</h1>
       {blog.imageUrl && (
@@ -240,6 +241,9 @@ const BlogDetailPage = () => {
         <p>Published on: {new Date(blog.createdAt.seconds * 1000).toLocaleDateString()}</p>
       </div>
     </div>
+    </div>
+    
+    
   );
 };
 
