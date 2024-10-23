@@ -107,23 +107,20 @@ const Navbar = () => {
           </a>
         </div>
 
-        {/* Links for Desktop */}
-        <div className="hidden md:flex items-center space-x-4 mt-2 md:mt-0">
-          <a href="/" className="text-gray-900 hover:text-[#00b4d8]">Home</a>
-          <a href="/features" className="text-gray-900 hover:text-[#00b4d8]">Features</a>
-          <a href="/about" className="text-gray-900 hover:text-[#00b4d8]">About</a>
-          <a href="/contact" className="text-gray-900 hover:text-[#00b4d8]">Contact</a>
+        {/* Centered Search Bar Container */}
+<div className="flex flex-grow justify-center mt-2 md:mt-0">
+  <div className="flex space-x-2 w-full max-w-md"> {/* Set max width here */}
+    <input
+      type="text"
+      placeholder="Search"
+      className="flex-grow px-4 py-3 border border-[#00b4d8] rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#00b4d8] transition-all duration-300 search-input" // Added a custom class
+    />
+    <button className="bg-[#00b4d8] text-white px-4 py-1 rounded-r-md hover:bg-[#0096c7] transition-all duration-300 search-button"> {/* Added a custom class */}
+      Search
+    </button>
+  </div>
+</div>
 
-          {/* Search Bar */}
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-64 px-4 py-2 border border-[#00b4d8] rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#00b4d8] transition-all duration-300"
-          />
-          <button className="bg-[#00b4d8] text-white px-2 py-1 rounded-r-md hover:bg-[#0096c7] transition-all duration-300">
-            Search
-          </button>
-        </div>
 
         {/* Right Side: User Profile Dropdown */}
         <div className="relative">
@@ -195,7 +192,6 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden flex flex-col space-y-2 mt-2">
           <a href="/" className="block p-2 text-gray-900 hover:bg-gray-100">Home</a>
-          <a href="/features" className="block p-2 text-gray-900 hover:bg-gray-100">Features</a>
           <a href="/about" className="block p-2 text-gray-900 hover:bg-gray-100">About</a>
           <a href="/contact" className="block p-2 text-gray-900 hover:bg-gray-100">Contact</a>
         </div>

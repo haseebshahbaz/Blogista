@@ -1,7 +1,5 @@
 // components/Testimonials.js
 
-
-
 const testimonials = [
   {
     name: "Ali Khan",
@@ -44,13 +42,13 @@ export default function Testimonials() {
   return (
     <section id="testimonials" className="bg-white py-16 overflow-hidden">
       <div className="max-w-7xl mx-auto px-8">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">What Our Readers Say</h2>
-        <div className="overflow-hidden">
-          <div className="flex animate-slider space-x-6">
-            {testimonials.map((testimonial, index) => (
+        <h1 className="text-4xl font-bold text-center text-[#00b4d8] mb-10">What Our Readers Say</h1>
+        <div className="overflow-hidden relative">
+          <div className="flex animate-slider py-5 px-5 space-x-6">
+            {testimonials.concat(testimonials).map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-gray-100 shadow-lg p-6 rounded-lg min-w-[250px]"
+                className="bg-white-100 shadow-lg p-6 rounded-lg min-w-[250px] transition-transform duration-300 ease-in-out"
               >
                 <img
                   src={testimonial.image}
@@ -64,6 +62,20 @@ export default function Testimonials() {
           </div>
         </div>
       </div>
+      <style js>{`
+        .animate-slider {
+          animation: scroll 20s linear infinite;
+        }
+
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </section>
   );
 }

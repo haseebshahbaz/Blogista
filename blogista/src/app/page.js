@@ -62,9 +62,9 @@ export default function Home() {
     <div>
       <Navbar userData={userData} />
       <HeroSection />
-      <FeaturedPosts posts={blogs} />
-      <Testimonials />
+      <FeaturedPosts posts={blogs}/>
       <AuthorBio />
+      <Testimonials />
       <CTABanner />
       <Footer />
     </div>

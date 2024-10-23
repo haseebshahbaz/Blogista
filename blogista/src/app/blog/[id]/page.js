@@ -184,7 +184,6 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation'; // Use `useParams` for App Router in Next.js
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firbase/firbase.js'; // Adjust based on your setup
-import { FaSpinner } from 'react-icons/fa'; // Import loading spinner icon
 import Loader from '@/app/components/Loader.js';
 import Navbar from '@/app/components/Navbar.js';
 
@@ -212,9 +211,8 @@ const BlogDetailPage = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <Loader />
-    ) }
+    return <Loader />;
+  }
 
   if (!blog) {
     return <p className="text-center">Blog not found!</p>;
@@ -223,27 +221,26 @@ const BlogDetailPage = () => {
   return (
     <div>
       <Navbar />
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-6">{blog.title}</h1>
-      {blog.imageUrl && (
-        <img
-          src={blog.imageUrl}
-          alt={blog.title}
-          className="w-full h-96 object-cover rounded-lg mb-6"
+      <div className="container mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold mb-6">{blog.title}</h1>
+        {blog.imageUrl && (
+          <img
+            src={blog.imageUrl}
+            alt={blog.title}
+            className="w-full h-96 object-cover rounded-lg mb-6 shadow-md"
+          />
+        )}
+        {/* Render the content safely using dangerouslySetInnerHTML */}
+        <div
+          className="text-lg leading-relaxed mb-6"
+          dangerouslySetInnerHTML={{ __html: blog.content }} // Render HTML content
         />
-      )}
-      <div
-        className="text-lg leading-relaxed mb-6"
-        dangerouslySetInnerHTML={{ __html: blog.content }} // Render HTML content
-      />
-      <div className="text-sm text-gray-500">
-        <p>Author: {blog.author || 'Admin'}</p>
-        <p>Published on: {new Date(blog.createdAt.seconds * 1000).toLocaleDateString()}</p>
+        <div className="text-sm text-gray-500 mt-4">
+          <p>Author: {blog.author || 'Admin'}</p>
+          <p>Published on: {new Date(blog.createdAt.seconds * 1000).toLocaleDateString()}</p>
+        </div>
       </div>
     </div>
-    </div>
-    
-    
   );
 };
 

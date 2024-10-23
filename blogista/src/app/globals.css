@@ -3,12 +3,6 @@
 @tailwind utilities;
 
 
-body {
-  font-family: Arial, sans-serif;
-}
-
-
-
 .login-container {
   max-width: 400px;
   margin: 50px auto;
@@ -17,20 +11,7 @@ body {
   border-radius: 5px;
 }
 
-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-}
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
 
 .dashboard-container {
   padding: 20px;
@@ -51,29 +32,6 @@ button {
   border-radius: 5px;
 }
 
-body {
-  font-family: Arial, sans-serif;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 10px 20px;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #005bb5;
-}
 
 .dashboard-container, .blog-list, .blog-detail {
   max-width: 800px;
@@ -113,14 +71,117 @@ button:hover {
   padding: 1rem;
 }
 
+.search-input {
+  /* Base styling */
+  height: 38px; /* Adjust height as needed */
+  font-size: 16px; /* Change font size */
+  width: 100%; /* Make it take full width of its container */
+  max-width: 300px; /* Set a maximum width */
+  box-sizing: border-box; /* Include padding and border in the element's total width */
+}
 
-/* styles/globals.css or styles/Testimonials.module.css */
-@keyframes slider {
-  0% {
-    transform: translateX(0);
+.search-button {
+  height: 38px; /* Match the height of the input */
+  font-size: 16px; /* Change font size */
+  width: 20%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .search-input {
+    font-size: 14px; /* Smaller font size on small screens */
   }
-  100% {
-    transform: translateX(-100%);
+
+  .search-button {
+    font-size: 14px; /* Smaller font size on small screens */
   }
 }
 
+@media (min-width: 640px) {
+  .search-input {
+    max-width: 250px; /* Adjust max width for larger screens */
+  }
+
+  .search-button {
+    padding: 0 20px; /* Increase padding for larger screens */
+  }
+}
+
+html, body {
+  height: 100%; /* Ensure the body takes full height */
+  margin: 0; /* Remove default margin */
+  font-family: 'Poppins', sans-serif; /* For headings */
+  
+  }
+
+.loader-container {
+  position: fixed; /* Make the loader fixed to cover the full screen */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white; /* Set background color */
+  z-index: 1000; /* Ensure it appears above all other content */
+}
+
+.cube-wrapper {
+  width: 50px;
+  height: 50px;
+  perspective: 1000px;
+}
+
+.cube {
+  width: 50px;
+  height: 50px;
+  background-color: #00b4d8;
+  transform-style: preserve-3d;
+  transform: rotateX(45deg) rotateY(45deg);
+  position: relative;
+}
+
+.cube::before,
+.cube::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #00b4d8;
+  border-radius: 5px;
+  backface-visibility: hidden;
+}
+
+.cube::before {
+  transform: rotateY(90deg);
+}
+
+.cube::after {
+  transform: rotateX(90deg);
+}
+
+.shadow-cube {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.1);
+  transform-style: preserve-3d;
+  transform: rotateX(45deg) rotateY(45deg);
+}
+
+@keyframes spin-cube {
+  0% {
+    transform: rotateX(45deg) rotateY(45deg);
+  }
+  100% {
+    transform: rotateX(405deg) rotateY(405deg);
+  }
+}
+
+.animate-spin-cube {
+  animation: spin-cube 2s infinite linear;
+}
