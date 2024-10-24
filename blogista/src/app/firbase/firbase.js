@@ -4,13 +4,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyASZ9TqULHPETY-HgkwJJRTwXP49qLuIkc",
+  authDomain: "blogista-90cb1.firebaseapp.com",
+  projectId: "blogista-90cb1",
+  storageBucket: "blogista-90cb1.appspot.com",
+  messagingSenderId: "478187114965",
+  appId: "1:478187114965:web:4a3b235d62c8c2c83ded5c",
+  measurementId: "G-069SNRM6G9"
 };
 
 const app = initializeApp(firebaseConfig);
