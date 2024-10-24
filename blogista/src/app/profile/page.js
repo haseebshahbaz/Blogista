@@ -1,39 +1,38 @@
 'use client'; // Ensure this is the first line in your file
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // For navigation purposes
-import { auth, db, storage } from '../firbase/firbase.js'; // Adjust the path
+import { useRouter } from 'next/navigation';
+import { auth, db, storage } from '../firbase/firbase.js';
 import { onAuthStateChanged, updateProfile } from 'firebase/auth';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import Image from 'next/image';
 import Navbar from '../components/Navbar';
-import Loader from '../components/Loader'; // Import the Loader component
+import Loader from '../components/Loader';
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null); // Authenticated user state
-  const [name, setName] = useState(''); // User's name state
-  const [fathersName, setFathersName] = useState(''); // Father's name state
-  const [profilePicture, setProfilePicture] = useState('/default-avatar.png'); // Profile picture state
-  const [newProfilePicture, setNewProfilePicture] = useState(null); // New profile picture
-  const [isSaving, setIsSaving] = useState(false); // Saving state
-  const [isEditing, setIsEditing] = useState(false); // Editing mode state
-  const [message, setMessage] = useState(''); // Message state for success/error
-  const [loading, setLoading] = useState(true); // Loading state
-  const router = useRouter(); // Router for navigation
+  const [user, setUser] = useState(null);
+  const [name, setName] = useState('');
+  const [fathersName, setFathersName] = useState('');
+  const [profilePicture, setProfilePicture] = useState('/default-avatar.png');
+  const [newProfilePicture, setNewProfilePicture] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        // User is authenticated, now query Firestore for their profile data
         const usersRef = collection(db, 'users');
         const q = query(usersRef, where('uid', '==', currentUser.uid));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0]; // Get the first document that matches the query
+          const userDoc = querySnapshot.docs[0];
           const userData = userDoc.data();
 
-          // Set user data
           setUser(currentUser);
           setName(userData.name || '');
           setFathersName(userData.fatherName || '');
@@ -42,7 +41,7 @@ const ProfilePage = () => {
           try {
             const profilePicRef = ref(storage, `profilePictures/${currentUser.uid}`);
             const picUrl = await getDownloadURL(profilePicRef);
-            setProfilePicture(picUrl); // If profile picture is found in storage
+            setProfilePicture(picUrl);
           } catch (error) {
             console.log('Error fetching profile picture:', error);
           }
@@ -50,34 +49,33 @@ const ProfilePage = () => {
           console.log('No user document found for the authenticated user');
         }
       } else {
-        console.log('No authenticated user found');
-        router.push('/login'); // Redirect to login if no user is authenticated
+        router.push('/login');
       }
-      setLoading(false); // Stop loading after data fetching
+      setLoading(false);
     });
 
-    return () => unsubscribe(); // Clean up the listener on unmount
+    return () => unsubscribe();
   }, [router]);
 
   const handleProfilePictureChange = (e) => {
     if (e.target.files[0]) {
-      setNewProfilePicture(e.target.files[0]); // Set new profile picture
+      setNewProfilePicture(e.target.files[0]);
     }
   };
 
   const handleEditClick = () => {
-    setIsEditing(true); // Enable editing mode
+    setIsEditing(true);
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false); // Cancel editing mode
-    setNewProfilePicture(null); // Reset new profile picture
-    setMessage(''); // Reset message
+    setIsEditing(false);
+    setNewProfilePicture(null);
+    setMessage('');
   };
 
   const handleSaveProfile = async () => {
-    setIsSaving(true); // Start saving process
-    setMessage(''); // Reset message
+    setIsSaving(true);
+    setMessage('');
 
     const currentUser = auth.currentUser;
     let updatedPhotoURL = profilePicture;
@@ -87,7 +85,7 @@ const ProfilePage = () => {
         const profilePicRef = ref(storage, `profilePictures/${currentUser.uid}`);
         await deleteObject(profilePicRef).catch(() => console.log('No old picture to delete'));
         await uploadBytes(profilePicRef, newProfilePicture);
-        updatedPhotoURL = await getDownloadURL(profilePicRef); // Upload and get new profile picture URL
+        updatedPhotoURL = await getDownloadURL(profilePicRef);
       }
 
       await updateProfile(currentUser, {
@@ -95,7 +93,6 @@ const ProfilePage = () => {
         photoURL: updatedPhotoURL,
       });
 
-      // Update Firestore document with new profile data
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('uid', '==', currentUser.uid));
       const querySnapshot = await getDocs(q);
@@ -107,24 +104,24 @@ const ProfilePage = () => {
         photoURL: updatedPhotoURL,
       });
 
-      setProfilePicture(updatedPhotoURL); // Update the profile picture in state
-      setIsEditing(false); // Disable editing mode
+      setProfilePicture(updatedPhotoURL);
+      setIsEditing(false);
       setMessage('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage('Failed to update profile. Please try again.');
     } finally {
-      setIsSaving(false); // End saving process
+      setIsSaving(false);
     }
   };
 
   if (loading) {
-    return <Loader />; // Show the loader while data is being fetched
+    return <Loader />;
   }
 
   return (
     <div>
-      <Navbar /> {/* Include Navbar */}
+      <Navbar />
 
       <div className="max-w-4xl mx-auto p-6">
         <h1 className="text-3xl font-bold text-center mb-6">Profile</h1>
@@ -132,7 +129,13 @@ const ProfilePage = () => {
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="flex justify-center mb-6">
             {profilePicture ? (
-              <img src={profilePicture} alt="Profile" className="w-32 h-32 rounded-full object-cover" />
+              <Image
+                src={profilePicture}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="rounded-full object-cover"
+              />
             ) : (
               <div className="w-32 h-32 bg-gray-300 rounded-full" />
             )}
@@ -161,7 +164,7 @@ const ProfilePage = () => {
               </div>
 
               <div className="mb-6">
-                <label className="block text-gray-700 font-semibold">Father's Name</label>
+                <label className="block text-gray-700 font-semibold">Father&apos;s Name</label>
                 <input
                   type="text"
                   value={fathersName}
@@ -194,7 +197,7 @@ const ProfilePage = () => {
               </div>
 
               <div className="mb-6">
-                <p className="text-gray-700 font-semibold">Father's Name:</p>
+                <p className="text-gray-700 font-semibold">Father&apos;s Name:</p>
                 <p className="mt-2 text-lg">{fathersName}</p>
               </div>
 

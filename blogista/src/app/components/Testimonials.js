@@ -1,4 +1,4 @@
-// components/Testimonials.js
+import Image from 'next/image'; // Import Image component
 
 const testimonials = [
   {
@@ -48,21 +48,24 @@ export default function Testimonials() {
             {testimonials.concat(testimonials).map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-white-100 shadow-lg p-6 rounded-lg min-w-[250px] transition-transform duration-300 ease-in-out"
+                className="bg-white shadow-lg p-6 rounded-lg min-w-[250px] transition-transform duration-300 ease-in-out"
               >
-                <img
+                <Image
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-16 h-16 rounded-full mx-auto mb-4"
+                  width={64} // Adjust width
+                  height={64} // Adjust height
+                  className="rounded-full mx-auto mb-4"
                 />
-                <p className="text-gray-700 italic mb-4">"{testimonial.feedback}"</p>
+                {/* Escaping the double quotes */}
+                <p className="text-gray-700 italic mb-4">&quot;{testimonial.feedback}&quot;</p>
                 <h4 className="text-lg font-semibold text-gray-900 text-center">{testimonial.name}</h4>
               </div>
             ))}
           </div>
         </div>
       </div>
-      <style js>{`
+      <style jsx>{`
         .animate-slider {
           animation: scroll 20s linear infinite;
         }

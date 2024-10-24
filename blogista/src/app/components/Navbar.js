@@ -3,11 +3,11 @@ import { useState, useEffect, useRef } from 'react';
 import { auth } from '../firbase/firbase.js';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { getDoc, doc, query, where, getDocs, collection } from 'firebase/firestore'; // Firestore functions
-import { db } from '../firbase/firbase.js'; // Firestore database import
-import Logo from "../assets/logo.png"; // Ensure the correct path to your logo
-import { HiMenu } from 'react-icons/hi'; // Hamburger icon
-import { HiX } from 'react-icons/hi'; // Close icon
+import { getDoc, doc, query, where, getDocs, collection } from 'firebase/firestore';
+import { db } from '../firbase/firbase.js';
+import Image from 'next/image'; // Import Image from Next.js
+import { HiMenu, HiX } from 'react-icons/hi';
+import Logo from '../assets/logo.png'; // Ensure correct path to logo
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,7 +17,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const router = typeof window !== 'undefined' ? useRouter() : null;
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
@@ -26,14 +26,12 @@ const Navbar = () => {
         setUser(user);
 
         try {
-          const userDocId = await getUserDocId(user.uid); // Fetch the document ID for the user
-          const userDocRef = doc(db, 'users', userDocId); // Use the fetched document ID
+          const userDocId = await getUserDocId(user.uid);
+          const userDocRef = doc(db, 'users', userDocId);
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
             setUserData(userDocSnap.data());
-          } else {
-            console.error("No such document in Firestore!");
           }
         } catch (error) {
           console.error("Error fetching user data: ", error);
@@ -44,85 +42,52 @@ const Navbar = () => {
       }
     });
 
-    // Close dropdown when clicking outside
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       unsubscribe();
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [router]);
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut(auth);
     setIsLoggedIn(false);
     setUser(null);
-    if (router) {
-      router.push('/'); // Redirect to login page after sign out
-    }
+    router.push('/');
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
 
-  // Function to get the correct document ID based on the user's UID
   const getUserDocId = async (uid) => {
-    const q = query(collection(db, 'users'), where('uid', '==', uid)); // Adjust to match your structure
+    const q = query(collection(db, 'users'), where('uid', '==', uid));
     const querySnapshot = await getDocs(q);
-    
-    if (!querySnapshot.empty) {
-      return querySnapshot.docs[0].id; // Return the document ID of the first matching document
-    } else {
-      throw new Error('No matching document found!');
-    }
+    return querySnapshot.docs[0]?.id || null;
   };
 
   return (
     <nav className="bg-white shadow-md p-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center flex-wrap">
-        {/* Left Side: Hamburger Menu and Logo */}
         <div className="flex items-center space-x-2">
-          {/* Hamburger Menu Icon */}
           <div
             onClick={toggleMobileMenu}
             className="md:hidden p-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#00b4d8] rounded-md"
-            aria-label="Toggle Menu"
           >
-            {isMobileMenuOpen ? (
-              <HiX className="w-6 h-6 text-gray-900" />
-            ) : (
-              <HiMenu className="w-6 h-6 text-gray-900" />
-            )}
+            {isMobileMenuOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
           </div>
 
-          {/* Logo */}
-          <a href="/" className="flex items-center space-x-2 text-xl font-bold text-gray-900">
-            <img src={Logo.src} alt="Logo" className="h-12" />
+          <a href="/" className="flex items-center space-x-2  font-bold">
+            <Image src={Logo.src} alt="Logo" width={150} height={150} />
           </a>
         </div>
 
-        {/* Centered Search Bar Container */}
-<div className="flex flex-grow justify-center mt-2 md:mt-0">
-  <div className="flex space-x-2 w-full max-w-md"> {/* Set max width here */}
-    <input
-      type="text"
-      placeholder="Search"
-      className="flex-grow px-4 py-3 border border-[#00b4d8] rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#00b4d8] transition-all duration-300 search-input" // Added a custom class
-    />
-    <button className="bg-[#00b4d8] text-white px-4 py-1 rounded-r-md hover:bg-[#0096c7] transition-all duration-300 search-button"> {/* Added a custom class */}
-      Search
-    </button>
-  </div>
-</div>
-
-
-        {/* Right Side: User Profile Dropdown */}
         <div className="relative">
           {!isLoggedIn ? (
             <div className="hidden md:flex items-center space-x-4 mt-2 md:mt-0">
@@ -144,18 +109,18 @@ const Navbar = () => {
                 aria-expanded={isDropdownOpen}
                 aria-haspopup="true"
               >
-                {/* User Avatar with Online Indicator */}
                 <div className="relative">
-                  <img
-                    src={user.photoURL || "/default-avatar.png"} // Fallback to default avatar
+                  <Image
+                    src={user.photoURL || "/default-avatar.png"}
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full border-2 border-[#00b4d8] shadow-md"
+                    width={40}
+                    height={40}
                   />
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
                 </div>
               </div>
 
-              {/* Dropdown Menu */}
               {isDropdownOpen && (
                 <div
                   ref={dropdownRef}
@@ -188,7 +153,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden flex flex-col space-y-2 mt-2">
           <a href="/" className="block p-2 text-gray-900 hover:bg-gray-100">Home</a>

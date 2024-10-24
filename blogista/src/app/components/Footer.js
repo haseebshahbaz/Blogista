@@ -1,4 +1,5 @@
 import { FaFacebookF, FaGithub, FaLinkedinIn, FaInstagram } from "react-icons/fa";
+import Image from "next/image"; // Import Image component
 import Logo from "../assets/logo.png";
 
 export default function Footer() {
@@ -8,10 +9,12 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
           {/* Logo and Description */}
           <div className="text-center md:text-left flex flex-col items-center md:items-start">
-            <img
+            <Image
               className="w-44 h-auto mb-3" // Adjusted size of the logo
-              src={Logo.src}
+              src={Logo}
               alt="Blogista Logo"
+              width={176} // Set appropriate width (44 * 4)
+              height={176} // Set appropriate height if needed
             />
             <p className="text-sm text-gray-900">
               Your go-to source for the latest insights in web development and technology.

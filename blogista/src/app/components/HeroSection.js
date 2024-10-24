@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image'; // Import Image component
 
 const Hero = () => {
   return (
@@ -19,10 +20,12 @@ const Hero = () => {
           {/* Add a background ribbon */}
 
           {/* Coding illustration image */}
-          <img 
+          <Image 
             src="https://cdni.iconscout.com/illustration/premium/thumb/blog-writer-working-on-article-illustration-download-in-svg-png-gif-file-formats--blogger-logo-female-content-typing-writing-news-pack-design-development-illustrations-4759515.png" 
             alt="Coding Illustration" 
-            className="relative z-10 w-72 md:w-96 rounded-lg shadow-lg"
+            width={288} // Adjust width (72 * 4) for responsiveness
+            height={300} // Set appropriate height based on design
+            className="relative z-10 rounded-lg shadow-lg"
           />
         </div>
       </div>

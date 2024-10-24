@@ -378,7 +378,7 @@ export default function Dashboard() {
                     required
                     className="w-full p-2 mb-4 border rounded"
                   />
-                  <label className="block mb-2 text-gray-700">Father's Name</label>
+                  <label className="block mb-2 text-gray-700">Father&apos;s Name</label>
                   <input
                     type="text"
                     value={newUserDetails.fatherName}
