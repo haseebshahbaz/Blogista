@@ -11,7 +11,7 @@
 - Smooth navigation between pages.
 
 ## Technologies Used
-- **React**: For building the user interface.
+- **Next**: For building the user interface.
 - **Firebase**: For backend services (Authentication and Firestore).
 - **Tailwind CSS**: For responsive and modern styling.
 - **JavaScript**: For interactive functionality and app logic.
